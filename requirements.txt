@@ -1,3 +1,5 @@
 os
 pydub
+openpyxl
 textgrid
+pyannote.audio
