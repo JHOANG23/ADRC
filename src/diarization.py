@@ -9,11 +9,7 @@ import torch
 import pandas as pd
 from pyannote.audio import Pipeline
 from textgrid import TextGrid, IntervalTier, Interval
-
-excel_file = '/home/jobe/ADRC/ADRC Hometown Pipeline.xlsx'
-input_dir = '../dataset/WavFiles'
-outputdir = '../dataset/SpeakerDiarization_Annotations'
-os.makedirs(outputdir, exist_ok=True)
+from config import EXCEL_PATH, AUDIO_INPUT_PATH, DIARIZATION_PATH
 
 pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
@@ -22,11 +18,11 @@ pipeline = Pipeline.from_pretrained(
 # send pipeline to GPU (when available)
 pipeline.to(torch.device("cuda"))
 
-spanish_sheet = pd.read_excel(excel_file, sheet_name=1, usecols='A')
+spanish_sheet = pd.read_excel(EXCEL_PATH, sheet_name=1, usecols='A')
 file_names = spanish_sheet.iloc[:,0].str.removesuffix(".wav")
 # loop through all wav files from the spanish recordings in the hometown dataset
 for pid in file_names:
-    matches = glob.glob(f"{input_dir}/{pid}*.wav")
+    matches = glob.glob(f"{AUDIO_INPUT_PATH}/{pid}*.wav")
     if not matches:
         continue
 
@@ -34,8 +30,8 @@ for pid in file_names:
     file_name = os.path.basename(full_wav_path)
     file_name = os.path.splitext(file_name)[0]
 
-    txt_output_file = f"{outputdir}/{file_name}_diarization_output.txt"
-    tg_output_file = f"{outputdir}/{file_name}_diarization_output.TextGrid"
+    txt_output_file = f"{DIARIZATION_PATH}/{file_name}_diarization_output.txt"
+    tg_output_file = f"{DIARIZATION_PATH}/{file_name}_diarization_output.TextGrid"
 
     # create diarized .txt file
     out = pipeline(full_wav_path)

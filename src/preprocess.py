@@ -9,11 +9,8 @@ import shutil
 import pandas as pd
 from textgrid import TextGrid
 from pydub import AudioSegment
+from config import  AUDIO_INPUT_PATH, DIARIZATION_PATH, TRIMMED_AUDIO_PATH
 
-# Global params
-AUDIO_INPUT_PATH = '../dataset/WavFiles'
-DIARIZATION_PATH = '../dataset/SpeakerDiarization_Annotations'
-TRIMMED_PATH = '../dataset/TrimmedWavFiles'
 NUM_INITIAL_PAUSES_TO_SKIP = 2  # skip this many initial pauses
 
 def trim_audio(wav_file_path, diarized_file_path, output_path, base_name):
@@ -75,19 +72,19 @@ def trim_audio(wav_file_path, diarized_file_path, output_path, base_name):
     # combine split audio segments
     segments_list = [audio[start * 1000 : end * 1000] for start, end in segments_to_keep]
     output_audio = sum(segments_list)
-
+    output_audio = output_audio.set_frame_rate(16000)
     out_path = os.path.join(output_path, f"{base_name}_trimmed.wav")
     output_audio.export(out_path, format="wav")
 
 def main():
     os.makedirs(AUDIO_INPUT_PATH, exist_ok=True)
     os.makedirs(DIARIZATION_PATH, exist_ok=True)
-    os.makedirs(TRIMMED_PATH, exist_ok=True)
-    os.makedirs(os.path.join(TRIMMED_PATH, "es"), exist_ok=True)
-    os.makedirs(os.path.join(TRIMMED_PATH, "en"), exist_ok=True)
+    os.makedirs(TRIMMED_AUDIO_PATH, exist_ok=True)
+    os.makedirs(os.path.join(TRIMMED_AUDIO_PATH, "es"), exist_ok=True)
+    os.makedirs(os.path.join(TRIMMED_AUDIO_PATH, "en"), exist_ok=True)
 
     print("Beginning trimming process")
-    excel_file = '/home/jobe/ADRC/ADRC Hometown Pipeline.xlsx'
+    excel_file = '/home/jobe/ADRC/excel/ADRC Hometown Pipeline.xlsx'
     spanish_sheet = pd.read_excel(excel_file, sheet_name=1, usecols='A')
     spanish_ids = set(spanish_sheet.iloc[:,0].str.removesuffix(".wav"))
     for file_name in os.listdir(DIARIZATION_PATH):
@@ -98,9 +95,9 @@ def main():
         base_name = file_name.split('.', 1)[0]
 
         if base_name in spanish_ids:
-            output_path = os.path.join(TRIMMED_PATH, "es")
+            output_path = os.path.join(TRIMMED_AUDIO_PATH, "es")
         else:
-            output_path = os.path.join(TRIMMED_PATH, "en")
+            output_path = os.path.join(TRIMMED_AUDIO_PATH, "en")
 
         base_name = file_name.removesuffix("_diarization_output.TextGrid")
         print(f"Trimming: {base_name}.wav")
