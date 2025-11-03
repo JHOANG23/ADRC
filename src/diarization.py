@@ -9,7 +9,7 @@ import torch
 import pandas as pd
 from pyannote.audio import Pipeline
 from textgrid import TextGrid, IntervalTier, Interval
-from config import EXCEL_PATH, AUDIO_INPUT_PATH, DIARIZATION_PATH
+from config import EXCEL_HOMETOWN_PATH, AUDIO_INPUT_PATH, DIARIZATION_PATH
 
 pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
@@ -18,7 +18,7 @@ pipeline = Pipeline.from_pretrained(
 # send pipeline to GPU (when available)
 pipeline.to(torch.device("cuda"))
 
-spanish_sheet = pd.read_excel(EXCEL_PATH, sheet_name=1, usecols='A')
+spanish_sheet = pd.read_excel(EXCEL_HOMETOWN_PATH, sheet_name=1, usecols='A')
 file_names = spanish_sheet.iloc[:,0].str.removesuffix(".wav")
 # loop through all wav files from the spanish recordings in the hometown dataset
 for pid in file_names:
