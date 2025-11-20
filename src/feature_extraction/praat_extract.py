@@ -29,7 +29,7 @@ import pandas as pd
 import parselmouth
 from textgrid import TextGrid
 from parselmouth.praat import call
-from config import TRIMMED_AUDIO_PATH, FEATURE_PATH, DIARIZATION_PATH
+from src.config import TRIMMED_AUDIO_PATH, FEATURE_PATH, DIARIZATION_PATH
 
 def interpolate_f0_intervals(df, num_intervals=10):
     interval_cols = [f"Mean_f0_Interval_{i}" for i in range(1, num_intervals + 1)]
@@ -125,9 +125,12 @@ def extract_prosodic_features(input_df: pd.DataFrame, output_dir: str, num_inter
     results = []
     f0_min, f0_max = 78, 350
     Y = []
+    es_count = 0
     for row in input_df.itertuples(index=False):
         if not row.file_name.endswith(".wav") or row.synd2 == -1.0 or np.isnan(row.synd2):
             continue
+        if row.language == 'es':
+            count +=1
         print(f"Extracting feature from {row.file_name}")
         wav_path = os.path.join(TRIMMED_AUDIO_PATH, row.language, row.file_name)
         snd = parselmouth.Sound(wav_path)
@@ -191,13 +194,17 @@ def extract_prosodic_features(input_df: pd.DataFrame, output_dir: str, num_inter
             *interval_means
         ])
         Y.append(row.synd2)
+    Y = np.array(Y)
     X_df = pd.DataFrame(results, columns=columns)
     X_df = interpolate_f0_intervals(X_df)
-    print(X_df)
     X_tensor = torch.tensor(X_df.values, dtype=torch.float32).cpu()
-    Y = np.array(Y)
     Y_tensor = torch.from_numpy(Y).long().cpu()
+
+    X_en_tensor = X_tensor[:-es_count]
+    Y_en_tensor = Y_tensor[:-es_count]
+    X_es_tensor = X_tensor[-es_count:]
+    Y_es_tensor = Y_tensor[-es_count:]
 
     print(f"Features extracted")
 
-    return X_tensor, Y_tensor
+    return X_en_tensor, Y_en_tensor, X_es_tensor, Y_es_tensor

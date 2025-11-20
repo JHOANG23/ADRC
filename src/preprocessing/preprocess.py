@@ -9,7 +9,7 @@ import shutil
 import pandas as pd
 from textgrid import TextGrid
 from pydub import AudioSegment
-from config import  AUDIO_INPUT_PATH, DIARIZATION_PATH, TRIMMED_AUDIO_PATH
+from src.config import  AUDIO_INPUT_PATH, DIARIZATION_PATH, TRIMMED_AUDIO_PATH
 
 NUM_INITIAL_PAUSES_TO_SKIP = 2  # skip this many initial pauses
 
@@ -84,7 +84,7 @@ def main():
     os.makedirs(os.path.join(TRIMMED_AUDIO_PATH, "en"), exist_ok=True)
 
     print("Beginning trimming process")
-    excel_file = '/home/jobe/ADRC/excel/ADRC Hometown Pipeline.xlsx'
+    excel_file = '/home/jobe/datasets/ADReSS-M/combined_csvs.xlsx'
     spanish_sheet = pd.read_excel(excel_file, sheet_name=1, usecols='A')
     spanish_ids = set(spanish_sheet.iloc[:,0].str.removesuffix(".wav"))
     for file_name in os.listdir(DIARIZATION_PATH):
@@ -103,7 +103,6 @@ def main():
         print(f"Trimming: {base_name}.wav")
         trim_audio(wav_file_path, diarized_file_path, output_path, base_name)
     print("Finished trimming patient audio recordings.")
-
 
 if __name__ == "__main__":
     main()
