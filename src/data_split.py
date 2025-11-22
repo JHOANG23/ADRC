@@ -1,8 +1,8 @@
 import torch
 import pandas as pd
-from src.utils import format_df
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset, TensorDataset
+from src.utils import format_df
 from src.config import TRIMMED_AUDIO_PATH, EXCEL_FULL_ADRC_PATH, FEATURE_PATH, MODEL_PATH
 
 
@@ -34,7 +34,6 @@ class MixedBatchIterator:
             en_x, en_y = next(self.en_iterator)
         except StopIteration:
             raise StopIteration
-
 
         num_es_injections = self.batch_size // 5 
         es_x_injections = []

@@ -3,11 +3,13 @@ import json
 import torch
 import numpy as np
 import pandas as pd
-from scipy import stats
-from src.train import Classifier
 import matplotlib.pyplot as plt
+
+from scipy import stats
+from src.train_eval.train import Classifier
 from src.config import FEATURE_PATH, EXCEL_FULL_ADRC_PATH, CHECKPOINT_PATH, METRICS_PATH
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
+
 def eval(model_path, input_dim, test_loader, device):
     """
     Evaluate a trained AD detection model on the test set.
