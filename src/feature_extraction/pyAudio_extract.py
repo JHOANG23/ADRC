@@ -50,7 +50,7 @@ def pyaudio_extract(df: pd.DataFrame, input_dir: str, mode: str, N: int):
             }
 
             for feat_name, value in zip(mt_n, feature_vector):
-                feature_dict[f"pyaudio_{feat_name}"] = float(value)
+                feature_dict[f"{feat_name}"] = float(value)
 
             csv_rows.append(feature_dict)
     return csv_rows
